@@ -66,10 +66,6 @@ paths:
                     description: List of products
                     items:
                       $ref: '#/components/schemas/Product'
-                  total_count:
-                    type: integer
-                    format: int64
-                    description: Total number of products available
                   page:
                     type: integer
                     format: int32
@@ -82,6 +78,10 @@ paths:
                     type: integer
                     format: int32
                     description: Total number of pages available based on the total count and size
+                  total_count:
+                    type: integer
+                    format: int64
+                    description: Total number of products available
         '400':
           description: Invalid request parameters
         '422':
@@ -107,6 +107,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid input
         '404':
           description: Product not found
         '500':

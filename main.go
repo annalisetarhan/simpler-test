@@ -53,8 +53,17 @@ func InitDatabase() *gorm.DB {
 		zap.S().Fatalf("Failed to connect to database: %v", err)
 	}
 
+	if err := db.Migrator().DropTable(&Product{}); err != nil {
+		zap.S().Fatalf("Failed to drop products table: %v", err)
+	}
+
 	if err := db.AutoMigrate(&Product{}); err != nil {
 		zap.S().Fatalf("Failed to migrate database schema: %v", err)
+	}
+
+	err = db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_sku_not_deleted ON products (sku) WHERE deleted_at IS NULL").Error
+	if err != nil {
+		zap.S().Fatalf("Failed to create sku index: %v", err)
 	}
 
 	zap.L().Info("Database connection initialized successfully")

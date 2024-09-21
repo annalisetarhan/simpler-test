@@ -45,10 +45,10 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			zap.L().Info("Failed to create product because request failed validation", zap.Any("validationErrors", validationErrors))
 			httpBadRequest(w, formatValidationErrors(validationErrors))
-		} else {
-			zap.L().Error("Unexpected error occurred during ProductCreateRequest validation", zap.Error(err))
-			http.Error(w, "unexpected error occurred", http.StatusInternalServerError)
+			return
 		}
+		zap.L().Error("Unexpected error occurred during ProductCreateRequest validation", zap.Error(err))
+		http.Error(w, "unexpected error occurred", http.StatusInternalServerError)
 		return
 	}
 
@@ -84,10 +84,10 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, ErrNotFound) {
 			zap.L().Info("Failed to retrieve product because product was not found", zap.Int("product ID", id))
 			http.Error(w, "product not found", http.StatusNotFound)
-		} else {
-			zap.L().Error("Failed to retrieve product", zap.Int("product ID", id), zap.Error(err))
-			http.Error(w, "failed to retrieve product", http.StatusInternalServerError)
+			return
 		}
+		zap.L().Error("Failed to retrieve product", zap.Int("product ID", id), zap.Error(err))
+		http.Error(w, "failed to retrieve product", http.StatusInternalServerError)
 		return
 	}
 
@@ -175,10 +175,10 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			zap.L().Info("Failed to update product because request failed validation", zap.Any("validationErrors", validationErrors))
 			httpBadRequest(w, formatValidationErrors(validationErrors))
-		} else {
-			zap.L().Error("Unexpected error occurred during ProductUpdateRequest validation", zap.Error(err))
-			http.Error(w, "unexpected error occurred", http.StatusInternalServerError)
+			return
 		}
+		zap.L().Error("Unexpected error occurred during ProductUpdateRequest validation", zap.Error(err))
+		http.Error(w, "unexpected error occurred", http.StatusInternalServerError)
 		return
 	}
 
@@ -187,6 +187,11 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, ErrDuplicateSKU) {
 			zap.L().Info("Failed to update product", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
+		if errors.Is(err, ErrNotFound) {
+			zap.L().Info("Failed to update product", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
 		zap.L().Error("Failed to update product", zap.Error(err))
