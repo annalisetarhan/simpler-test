@@ -1,12 +1,11 @@
 module github.com/annalisetarhan/simpler-test
 
-go 1.21.4
+go 1.21
 
 require (
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/gorilla/mux v1.8.1
 	github.com/jackc/pgx/v5 v5.5.5
-	github.com/joho/godotenv v1.5.1
 	go.uber.org/zap v1.27.0
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.12

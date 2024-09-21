@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -34,10 +33,6 @@ func main() {
 }
 
 func InitDatabase() *gorm.DB {
-	err := godotenv.Load()
-	if err != nil {
-		zap.S().Fatalf("Failed to load .env file: %v", err)
-	}
 
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
