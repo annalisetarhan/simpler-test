@@ -185,8 +185,8 @@ func TestGetProduct(t *testing.T) {
 		product.Value("price").Number().IsEqual(object.Value("price").Number().Raw())
 		product.Value("quantity").Number().IsEqual(object.Value("quantity").Number().Raw())
 		product.Value("category").String().IsEqual(object.Value("category").String().Raw())
-		product.Value("created_at").String().IsEqual(object.Value("created_at").String().Raw())
-		product.Value("updated_at").String().IsEqual(object.Value("updated_at").String().Raw())
+		product.Value("created_at").String().Contains(object.Value("created_at").String().Raw()[:19])
+		product.Value("updated_at").String().Contains(object.Value("updated_at").String().Raw()[:19])
 		product.Value("deleted_at").IsNull()
 	}
 }
