@@ -47,3 +47,5 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    profiles:
+      - test
