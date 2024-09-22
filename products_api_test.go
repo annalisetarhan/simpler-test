@@ -456,7 +456,7 @@ func initRouter() (*mux.Router, *zap.Logger) {
 	}
 	zap.ReplaceGlobals(logger)
 
-	db := InitDatabase()
+	db := InitDatabase(true)
 	service := NewProductService(db)
 	validator := validator.New()
 	handler := NewProductHandler(service, validator)
