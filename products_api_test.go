@@ -11,11 +11,13 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 func TestEmptyDatabase(t *testing.T) {
-	router, logger := initRouter()
+	router, logger, db := initRouter()
 	defer logger.Sync()
+	defer CleanDatabase(db)
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -34,8 +36,9 @@ func TestEmptyDatabase(t *testing.T) {
 }
 
 func TestCreateProducts(t *testing.T) {
-	router, logger := initRouter()
+	router, logger, db := initRouter()
 	defer logger.Sync()
+	defer CleanDatabase(db)
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -151,8 +154,9 @@ func TestCreateProducts(t *testing.T) {
 }
 
 func TestGetProduct(t *testing.T) {
-	router, logger := initRouter()
+	router, logger, db := initRouter()
 	defer logger.Sync()
+	defer CleanDatabase(db)
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -192,8 +196,9 @@ func TestGetProduct(t *testing.T) {
 }
 
 func TestGetProducts(t *testing.T) {
-	router, logger := initRouter()
+	router, logger, db := initRouter()
 	defer logger.Sync()
+	defer CleanDatabase(db)
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -286,8 +291,9 @@ func TestGetProducts(t *testing.T) {
 }
 
 func TestUpdateProducts(t *testing.T) {
-	router, logger := initRouter()
+	router, logger, db := initRouter()
 	defer logger.Sync()
+	defer CleanDatabase(db)
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -405,8 +411,9 @@ func TestUpdateProducts(t *testing.T) {
 }
 
 func TestDeleteProducts(t *testing.T) {
-	router, logger := initRouter()
+	router, logger, db := initRouter()
 	defer logger.Sync()
+	defer CleanDatabase(db)
 
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -449,19 +456,21 @@ func TestDeleteProducts(t *testing.T) {
 	}
 }
 
-func initRouter() (*mux.Router, *zap.Logger) {
+func initRouter() (*mux.Router, *zap.Logger, *gorm.DB) {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		log.Fatalf("Failed to initialize logger: %v", err)
 	}
 	zap.ReplaceGlobals(logger)
 
-	db := InitDatabase(true)
+	db := InitDatabase()
+	CleanDatabase(db)
+
 	service := NewProductService(db)
 	validator := validator.New()
 	handler := NewProductHandler(service, validator)
 
-	return InitRouter(handler), logger
+	return InitRouter(handler), logger, db
 }
 
 func getSampleProductRequests() []ProductCreateRequest {

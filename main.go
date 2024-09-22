@@ -21,7 +21,7 @@ func main() {
 	defer logger.Sync()
 	zap.ReplaceGlobals(logger)
 
-	db := InitDatabase(false)
+	db := InitDatabase()
 	service := NewProductService(db)
 	validator := validator.New()
 	handler := NewProductHandler(service, validator)
@@ -32,7 +32,7 @@ func main() {
 
 }
 
-func InitDatabase(dropData bool) *gorm.DB {
+func InitDatabase() *gorm.DB {
 
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
@@ -48,12 +48,6 @@ func InitDatabase(dropData bool) *gorm.DB {
 		zap.S().Fatalf("Failed to connect to database: %v", err)
 	}
 
-	if dropData {
-		if err := db.Migrator().DropTable(&Product{}); err != nil {
-			zap.S().Fatalf("Failed to drop products table: %v", err)
-		}
-	}
-
 	if err := db.AutoMigrate(&Product{}); err != nil {
 		zap.S().Fatalf("Failed to migrate database schema: %v", err)
 	}
@@ -65,4 +59,10 @@ func InitDatabase(dropData bool) *gorm.DB {
 
 	zap.L().Info("Database connection initialized successfully")
 	return db
+}
+
+func CleanDatabase(db *gorm.DB) {
+	if err := db.Migrator().DropTable(&Product{}); err != nil {
+		zap.S().Fatalf("Failed to drop products table: %v", err)
+	}
 }
